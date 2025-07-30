@@ -1,63 +1,55 @@
 from flask import Flask, render_template, request, jsonify
 from helpers import Mal, append_to_csv, get_all_mustahsiller, save_mustahsil
-from printer import yazdir
+from printer import yazdir # Güncellenmiş printer.py'den import ediliyor
 import sys
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-    """Ana sayfayı render eder."""
     return render_template('index.html')
 
-# --- YENİ API ENDPOINT'LERİ ---
 @app.route('/api/mustahsiller', methods=['GET'])
 def api_get_mustahsiller():
-    """Kayıtlı tüm müstahsil isimlerini JSON olarak döndürür."""
     return jsonify(get_all_mustahsiller())
 
-# --- GÜNCELLENMİŞ ENDPOINT ---
 @app.route('/print_and_save', methods=['POST'])
 def print_and_save():
-    """
-    Web arayüzünden gelen fiş verilerini alır, CSV'ye kaydeder,
-    yazıcıya gönderir ve müstahsil adını veritabanına ekler.
-    """
     data = request.get_json()
-    if not data or 'mustahsilAdi' not in data or 'malListesi' not in data:
+    required_keys = ['mustahsilAdi', 'malListesi', 'fisTarihi', 'printerConfig']
+    if not data or not all(key in data for key in required_keys):
         return jsonify({'status': 'error', 'message': 'Eksik veri gönderildi.'}), 400
 
     mustahsil_adi = data['mustahsilAdi']
     mal_listesi_json = data['malListesi']
+    fis_tarihi = data['fisTarihi']
+    printer_config = data['printerConfig']
 
     mal_nesneleri = []
     for item_data in mal_listesi_json:
-        try:
-            mal = Mal(
-                sahip=mustahsil_adi, cins=item_data['cins'], kasa=item_data['kasaTuru'],
-                dolu_kantar=float(item_data['doluKantar']), bos_kantar=float(item_data['bosKantar']),
-                adet=int(item_data['adet'])
-            )
-            mal_nesneleri.append(mal)
-        except (KeyError, ValueError) as e:
-            return jsonify({'status': 'error', 'message': f'Hatalı veri yapısı: {e}'}), 400
+        mal = Mal(
+            sahip=mustahsil_adi, cins=item_data['cins'], kasa=item_data['kasaTuru'],
+            dolu_kantar=float(item_data['doluKantar']), bos_kantar=float(item_data['bosKantar']),
+            adet=int(item_data['adet'])
+        )
+        mal_nesneleri.append(mal)
 
     if not mustahsil_adi or not mal_nesneleri:
         return jsonify({'status': 'error', 'message': 'Müstahsil adı veya mal listesi boş olamaz.'}), 400
 
     try:
-        # 1. CSV dosyasına kaydet
-        append_to_csv(mustahsil_adi, mal_nesneleri)
+        append_to_csv(mustahsil_adi, mal_nesneleri, fis_tarihi)
+        
+        # Arayüzden gelen VID ve PID'yi al. Hex string'i integer'a çevir.
+        vid = int(printer_config.get('vid', '0x8866'), 16)
+        pid = int(printer_config.get('pid', '0x0100'), 16)
+        
+        # Yazdır fonksiyonunu yeni ayarlar ile çağır
+        yazdir(mustahsil_adi, mal_nesneleri, fis_tarihi=fis_tarihi, vid=vid, pid=pid)
+        yazdir(mustahsil_adi, mal_nesneleri, fis_tarihi=fis_tarihi, vid=vid, pid=pid)
+        
 
-        # 2. Yazıcıya gönder (Bu fonksiyonun printer.py'de olması gerekir)
-        yazdir(mustahsil_adi,mal_nesneleri)
-        yazdir(mustahsil_adi,mal_nesneleri)
-        # from printer import yazdir
-        # yazdir(mustahsil_adi, mal_nesneleri)
-
-        # 3. Müstahsil adını kaydet (YENİ)
         save_mustahsil(mustahsil_adi)
-
         return jsonify({'status': 'success', 'message': 'Fiş başarıyla kaydedildi ve yazdırıldı.'})
 
     except Exception as e:

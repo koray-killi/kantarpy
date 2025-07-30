@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Koray.Fis Web</title>
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Önceki stiller burada yer alıyor, değişiklik yok */
         :root {
             --bg-gradient: linear-gradient(to bottom right, #f1f5f9, #e2e8f0);
             --card-bg-color: white;
@@ -15,15 +13,9 @@
             --text-color-secondary: #475569;
             --border-color: #cbd5e1;
             --input-bg-color: white;
-            --canvas-bg-color: #f8fafc;
-            --canvas-border-color: #94a3b8;
-            --canvas-text-color: '#334155';
-            --btn-primary-gradient: linear-gradient(to right, #3b82f6, #2563eb);
-            --btn-primary-hover-gradient: linear-gradient(to right, #2563eb, #1d4ed8);
-            --btn-secondary-gradient: linear-gradient(to right, #64748b, #475569);
-            --btn-secondary-hover-gradient: linear-gradient(to right, #475569, #334155);
-            --btn-danger-gradient: linear-gradient(to right, #ef4444, #dc2626);
-            --btn-danger-hover-gradient: linear-gradient(to right, #dc2626, #b91c1c);
+            --btn-primary-gradient: linear-gradient(145deg, #4b9aff, #2563eb);
+            --btn-secondary-gradient: linear-gradient(145deg, #8091a8, #475569);
+            --btn-danger-gradient: linear-gradient(145deg, #ff6b6b, #dc2626);
         }
         html.dark {
             --bg-gradient: linear-gradient(to bottom right, #0f172a, #1e293b);
@@ -32,63 +24,92 @@
             --text-color-secondary: #94a3b8;
             --border-color: #475569;
             --input-bg-color: #334155;
-            --canvas-bg-color: #0f172a;
-            --canvas-border-color: #475569;
-            --canvas-text-color: '#e2e8f0';
-            --btn-primary-gradient: linear-gradient(to right, #60a5fa, #3b82f6);
-            --btn-primary-hover-gradient: linear-gradient(to right, #3b82f6, #2563eb);
-            --btn-secondary-gradient: linear-gradient(to right, #94a3b8, #64748b);
-            --btn-secondary-hover-gradient: linear-gradient(to right, #64748b, #475569);
-            --btn-danger-gradient: linear-gradient(to right, #f87171, #ef4444);
-            --btn-danger-hover-gradient: linear-gradient(to right, #ef4444, #dc2626);
+            --btn-primary-gradient: linear-gradient(145deg, #60a5fa, #3b82f6);
+            --btn-secondary-gradient: linear-gradient(145deg, #94a3b8, #64748b);
+            --btn-danger-gradient: linear-gradient(145deg, #f87171, #ef4444);
         }
-        body { background-image: var(--bg-gradient); color: var(--text-color-secondary); transition: background-color 0.3s, color 0.3s; }
+        body { background-image: var(--bg-gradient); color: var(--text-color-secondary); }
         .card { background-color: var(--card-bg-color); border-radius: 0.75rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); padding: 1.5rem; transition: background-color 0.3s; border: 1px solid var(--border-color); }
         h1, h2, label { color: var(--text-color-primary); }
         input, select { background-color: var(--input-bg-color); border: 1px solid var(--border-color); color: var(--text-color-primary); border-radius: 0.5rem; }
-        .btn { padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; color: white; transition: all 0.2s ease-in-out; cursor: pointer; border: none; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .btn {
+            padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; color: white; cursor: pointer;
+            border-top: 1px solid rgba(255, 255, 255, 0.3); border-left: 1px solid rgba(255, 255, 255, 0.3);
+            border-right: 1px solid rgba(0, 0, 0, 0.2); border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.2), 0px 4px 8px rgba(0, 0, 0, 0.4);
+            transition: all 0.1s ease-in-out;
+        }
+        .btn:active { transform: translateY(2px); box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.4), 0px 1px 2px rgba(0, 0, 0, 0.5); }
         .btn-primary { background-image: var(--btn-primary-gradient); }
-        .btn-primary:hover { background-image: var(--btn-primary-hover-gradient); }
         .btn-secondary { background-image: var(--btn-secondary-gradient); }
-        .btn-secondary:hover { background-image: var(--btn-secondary-hover-gradient); }
         .btn-danger { background-image: var(--btn-danger-gradient); }
-        .btn-danger:hover { background-image: var(--btn-danger-hover-gradient); }
-        #receiptCanvas { border: 1px dashed var(--canvas-border-color); width: 100%; background-color: var(--canvas-bg-color); border-radius: 0.5rem; }
         .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        /* Canvas'ın kapsayıcısına tam sığması için */
+        #receiptCanvas { width: 100%; height: auto; display: block; border-radius: 0.5rem; border: 1px dashed var(--border-color); }
     </style>
 </head>
 <body class="p-4 md:p-8 font-sans">
+
+    <!-- Ayarlar Modalı -->
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center hidden z-50">
+        <div class="card w-full max-w-lg">
+            <h2 class="text-2xl font-bold mb-6">Ayarlar</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4 p-4 rounded-lg border" style="border-color: var(--border-color)">
+                    <h3 class="font-semibold text-lg">Kantar Ayarları</h3>
+                    <div><label for="comPort" class="block mb-1 text-sm">COM Portu</label><input type="text" id="comPort" class="w-full p-2" placeholder="Örn: COM3"></div>
+                    <div><label for="baudRate" class="block mb-1 text-sm">Baud Rate</label><input type="number" id="baudRate" class="w-full p-2" placeholder="Örn: 1200"></div>
+                </div>
+                <div class="space-y-4 p-4 rounded-lg border" style="border-color: var(--border-color)">
+                    <h3 class="font-semibold text-lg">Yazıcı Ayarları</h3>
+                    <div><label for="printerVID" class="block mb-1 text-sm">Vendor ID (VID)</label><input type="text" id="printerVID" class="w-full p-2" placeholder="Örn: 0x8866"></div>
+                    <div><label for="printerPID" class="block mb-1 text-sm">Product ID (PID)</label><input type="text" id="printerPID" class="w-full p-2" placeholder="Örn: 0x0100"></div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-4 mt-6">
+                <button id="cancelSettingsBtn" class="btn btn-secondary">İptal</button>
+                <button id="saveSettingsBtn" class="btn btn-primary">Kaydet</button>
+            </div>
+        </div>
+    </div>
 
     <div class="max-w-6xl mx-auto">
         <header class="text-center mb-8 relative">
             <h1 class="text-4xl font-bold">Koray.Fis Web</h1>
             <p>Müstahsil Bilgi Fişi Programı</p>
-             <div id="kantar-status" class="absolute top-0 left-0 flex items-center space-x-2 p-2 bg-white/50 dark:bg-slate-800/50 rounded-full text-sm">
+            <div id="kantar-status" class="absolute top-0 left-0 flex items-center space-x-2 p-2 bg-white/50 dark:bg-slate-800/50 rounded-full text-sm">
                 <span id="status-dot" class="status-dot bg-yellow-500"></span>
                 <span id="status-text">Kantar aranıyor...</span>
             </div>
-            <button id="theme-toggle" class="absolute top-0 right-0 p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500" style="--ring-offset-color: var(--bg-color);">
-                <svg id="theme-toggle-dark-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                <svg id="theme-toggle-light-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 7.071a1 1 0 011.414 0l.707.707a1 1 0 11-1.414 1.414l-.707-.707a1 1 0 010-1.414zM3 11a1 1 0 100 2h1a1 1 0 100-2H3z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
-            </button>
+            <div class="absolute top-0 right-0 flex gap-2">
+                <button id="settingsBtn" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01-.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+                </button>
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
+                    <svg id="theme-toggle-dark-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 7.071a1 1 0 011.414 0l.707.707a1 1 0 11-1.414 1.414l-.707-.707a1 1 0 010-1.414zM3 11a1 1 0 100 2h1a1 1 0 100-2H3z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                </button>
+            </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Sol Taraf: Giriş Formları -->
             <div class="card flex flex-col space-y-6">
-                <!-- Müstahsil Adı -->
-                <div>
-                    <label for="mustahsilAdi" class="block text-lg font-semibold mb-2">1. Müstahsil Adı</label>
-                    <!-- YENİ: Otomatik tamamlama için datalist eklendi -->
-                    <input type="text" id="mustahsilAdi" list="mustahsil-listesi" class="w-full p-3" placeholder="Müstahsil adını yazın veya seçin...">
-                    <datalist id="mustahsil-listesi"></datalist>
+                <!-- Form Alanları -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="mustahsilAdi" class="block text-lg font-semibold mb-2">Müstahsil Adı</label>
+                        <input type="text" id="mustahsilAdi" list="mustahsil-listesi" class="w-full p-3" placeholder="Yazın veya seçin...">
+                        <datalist id="mustahsil-listesi"></datalist>
+                    </div>
+                    <div>
+                        <label for="fisTarihi" class="block text-lg font-semibold mb-2">Fiş Tarihi</label>
+                        <input type="datetime-local" id="fisTarihi" class="w-full p-3">
+                    </div>
                 </div>
-
-                <!-- Mal Ekleme Formu -->
                 <div class="border-t border-b py-6" style="border-color: var(--border-color);">
-                    <h2 class="text-lg font-semibold mb-2">2. Fişe Mal Ekle</h2>
+                    <h2 class="text-lg font-semibold mb-2">Fişe Mal Ekle</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <input type="text" id="malCinsi" placeholder="Malın Cinsi" class="p-2 col-span-2">
                         <select id="kasaTuru" class="p-2 col-span-2">
@@ -96,31 +117,20 @@
                             <option value="sepet">Sepet (1.3kg)</option>
                             <option value="standart">Standart Kasa (1.5kg)</option>
                             <option value="büyük">Büyük Kasa (2.0kg)</option>
+                            <option value="dev">Dev Kasa (2.5kg)</option>
                         </select>
-                        <div class="relative col-span-1">
-                            <input type="number" id="doluKantar" placeholder="Dolu Kantar (kg)" class="p-2 w-full">
-                            <button id="getDoluBtn" class="absolute right-1 top-1/2 -translate-y-1/2 text-xs bg-blue-500 text-white px-2 py-1 rounded disabled:opacity-50">Oku</button>
-                        </div>
-                        <div class="relative col-span-1">
-                            <input type="number" id="bosKantar" placeholder="Boş Kantar (kg)" class="p-2 w-full">
-                            <button id="getBosBtn" class="absolute right-1 top-1/2 -translate-y-1/2 text-xs bg-blue-500 text-white px-2 py-1 rounded disabled:opacity-50">Oku</button>
-                        </div>
+                        <div class="relative col-span-1"><input type="number" id="doluKantar" placeholder="Dolu Kantar (kg)" class="p-2 w-full"><button id="getDoluBtn" class="absolute right-1 top-1/2 -translate-y-1/2 text-xs bg-blue-500 text-white px-2 py-1 rounded disabled:opacity-50">Oku</button></div>
+                        <div class="relative col-span-1"><input type="number" id="bosKantar" placeholder="Boş Kantar (kg)" class="p-2 w-full"><button id="getBosBtn" class="absolute right-1 top-1/2 -translate-y-1/2 text-xs bg-blue-500 text-white px-2 py-1 rounded disabled:opacity-50">Oku</button></div>
                         <input type="number" id="adet" placeholder="Kasa Adedi" class="p-2 col-span-2">
                         <button id="addMalBtn" class="btn btn-secondary md:col-span-2">Mal Ekle</button>
                     </div>
                 </div>
-                
-                <!-- Eklenen Mallar Listesi -->
                 <div>
                     <h2 class="text-lg font-semibold mb-2">Eklenen Mallar</h2>
-                    <div id="malListesiContainer" class="space-y-2 max-h-48 overflow-y-auto pr-2">
-                        <p id="emptyListMessage">Henüz mal eklenmedi.</p>
-                    </div>
+                    <div id="malListesiContainer" class="space-y-2 max-h-48 overflow-y-auto pr-2"><p id="emptyListMessage">Henüz mal eklenmedi.</p></div>
                 </div>
-
-                <!-- Ana Kontrol Butonları -->
                 <div class="mt-auto pt-6 border-t" style="border-color: var(--border-color);">
-                    <h2 class="text-lg font-semibold mb-2">3. Fişi Tamamla</h2>
+                    <h2 class="text-lg font-semibold mb-2">Fişi Tamamla</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <button id="printSaveBtn" class="btn btn-primary">Fişi Yazdır ve Kaydet</button>
                         <button id="newTabBtn" class="btn btn-secondary">Yeni Sekmede Aç</button>
@@ -129,137 +139,221 @@
                 </div>
                  <div id="result-message" class="hidden text-center p-4 rounded-lg mt-4"></div>
             </div>
-
-            <!-- Sağ Taraf: Fiş Önizleme -->
-            <div class="card">
+            <div class="card" id="canvas-container">
                 <h2 class="text-xl font-bold mb-4">Fiş Önizleme</h2>
-                <canvas id="receiptCanvas" width="450" height="700"></canvas>
+                <canvas id="receiptCanvas"></canvas>
             </div>
         </div>
     </div>
 
     <script>
-        // State management
-        let malListesi = [];
-        let lastWeightFromScale = null;
+        // --- State Management & DOM Elements ---
+        let malListesi = [], lastWeightFromScale = null, scaleSocket = null;
+        const dom = {
+            doluKantar: document.getElementById('doluKantar'), bosKantar: document.getElementById('bosKantar'), getDoluBtn: document.getElementById('getDoluBtn'), getBosBtn: document.getElementById('getBosBtn'),
+            statusDot: document.getElementById('status-dot'), statusText: document.getElementById('status-text'), mustahsilAdi: document.getElementById('mustahsilAdi'), mustahsilDatalist: document.getElementById('mustahsil-listesi'),
+            fisTarihi: document.getElementById('fisTarihi'), settingsModal: document.getElementById('settings-modal'), settingsBtn: document.getElementById('settingsBtn'), saveSettingsBtn: document.getElementById('saveSettingsBtn'),
+            cancelSettingsBtn: document.getElementById('cancelSettingsBtn'), comPort: document.getElementById('comPort'), baudRate: document.getElementById('baudRate'), printerVID: document.getElementById('printerVID'),
+            printerPID: document.getElementById('printerPID'), malCinsi: document.getElementById('malCinsi'), kasaTuru: document.getElementById('kasaTuru'), adet: document.getElementById('adet'), addMalBtn: document.getElementById('addMalBtn'),
+            printSaveBtn: document.getElementById('printSaveBtn'), cancelBtn: document.getElementById('cancelBtn'), newTabBtn: document.getElementById('newTabBtn'), canvas: document.getElementById('receiptCanvas'),
+            canvasContainer: document.getElementById('canvas-container'), resultMessage: document.getElementById('result-message'), malListesiContainer: document.getElementById('malListesiContainer'), emptyListMessage: document.getElementById('emptyListMessage'),
+            themeToggle: document.getElementById('theme-toggle'), darkIcon: document.getElementById('theme-toggle-dark-icon'), lightIcon: document.getElementById('theme-toggle-light-icon')
+        };
+        const ctx = dom.canvas.getContext('2d');
 
-        // DOM Elements
-        const doluKantarInput = document.getElementById('doluKantar');
-        const bosKantarInput = document.getElementById('bosKantar');
-        const getDoluBtn = document.getElementById('getDoluBtn');
-        const getBosBtn = document.getElementById('getBosBtn');
-        const statusDot = document.getElementById('status-dot');
-        const statusText = document.getElementById('status-text');
-        const mustahsilAdiInput = document.getElementById('mustahsilAdi');
-        const mustahsilDatalist = document.getElementById('mustahsil-listesi');
-        // ... diğer elementler
-        const malCinsiInput = document.getElementById('malCinsi');
-        const kasaTuruSelect = document.getElementById('kasaTuru');
-        const adetInput = document.getElementById('adet');
-        const addMalBtn = document.getElementById('addMalBtn');
-        const printSaveBtn = document.getElementById('printSaveBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const newTabBtn = document.getElementById('newTabBtn');
-        const canvas = document.getElementById('receiptCanvas');
-        const ctx = canvas.getContext('2d');
-        const resultMessage = document.getElementById('result-message');
-        const malListesiContainer = document.getElementById('malListesiContainer');
-        const emptyListMessage = document.getElementById('emptyListMessage');
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const darkIcon = document.getElementById('theme-toggle-dark-icon');
-        const lightIcon = document.getElementById('theme-toggle-light-icon');
+        // --- Settings Logic ---
+        function getSettings() {
+            const saved = localStorage.getItem('deviceSettings');
+            const defaults = { scale: { port: 'COM3', baud: 1200 }, printer: { vid: '0x8866', pid: '0x0100' } };
+            return saved ? JSON.parse(saved) : defaults;
+        }
+        function openSettingsModal() {
+            const settings = getSettings();
+            dom.comPort.value = settings.scale.port;
+            dom.baudRate.value = settings.scale.baud;
+            dom.printerVID.value = settings.printer.vid;
+            dom.printerPID.value = settings.printer.pid;
+            dom.settingsModal.classList.remove('hidden');
+        }
+        function saveSettings() {
+            const settings = {
+                scale: { port: dom.comPort.value || 'COM3', baud: parseInt(dom.baudRate.value) || 1200 },
+                printer: { vid: dom.printerVID.value || '0x8866', pid: dom.printerPID.value || '0x0100' }
+            };
+            localStorage.setItem('deviceSettings', JSON.stringify(settings));
+            dom.settingsModal.classList.add('hidden');
+            connectToScale();
+        }
 
-        // --- YENİ: Müstahsil Listesini Yükleme ---
+        // --- WebSocket Logic ---
+        function connectToScale() {
+            if (scaleSocket && scaleSocket.readyState === WebSocket.OPEN) scaleSocket.close();
+            const settings = getSettings();
+            scaleSocket = new WebSocket('ws://localhost:5678');
+            scaleSocket.onopen = () => {
+                dom.statusText.textContent = 'Ayarlar gönderiliyor...';
+                scaleSocket.send(JSON.stringify({ type: 'configure', settings: settings.scale }));
+            };
+            scaleSocket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'status') {
+                    dom.statusText.textContent = data.message;
+                    dom.statusDot.className = data.status === 'connected' ? 'status-dot bg-green-500' : 'status-dot bg-red-500';
+                    dom.getDoluBtn.disabled = data.status !== 'connected'; dom.getBosBtn.disabled = data.status !== 'connected';
+                } else if (data.type === 'weight_update') {
+                    lastWeightFromScale = data.weight;
+                    dom.statusText.textContent = `Kantar: ${data.weight.toFixed(3)} kg`;
+                }
+            };
+            scaleSocket.onclose = () => {
+                dom.statusDot.className = 'status-dot bg-red-500'; dom.statusText.textContent = 'Bağlantı Kesildi';
+                dom.getDoluBtn.disabled = true; dom.getBosBtn.disabled = true;
+                setTimeout(connectToScale, 5000);
+            };
+            scaleSocket.onerror = () => { dom.statusText.textContent = 'Bağlantı Hatası'; scaleSocket.close(); };
+        }
+
+        // --- Other Functions ---
+        const setCurrentDateTime = () => { const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); dom.fisTarihi.value = now.toISOString().slice(0, 16); };
+        const applyTheme = (isDark) => {
+            document.documentElement.classList.toggle('dark', isDark);
+            dom.lightIcon.classList.toggle('hidden', isDark);
+            dom.darkIcon.classList.toggle('hidden', !isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            resizeCanvas(); // Rengi güncellemek için yeniden çiz
+        };
+        const getDara = (kasaTuru, adet) => ({ 'siyah': 0.7, 'sepet': 1.3, 'standart': 1.5, 'büyük': 2.0, 'dev': 2.5 }[kasaTuru] || 0) * adet;
+        
         async function loadMustahsiller() {
             try {
                 const response = await fetch('/api/mustahsiller');
                 const mustahsiller = await response.json();
-                mustahsilDatalist.innerHTML = ''; // Listeyi temizle
+                dom.mustahsilDatalist.innerHTML = '';
                 mustahsiller.forEach(name => {
                     const option = document.createElement('option');
                     option.value = name;
-                    mustahsilDatalist.appendChild(option);
+                    dom.mustahsilDatalist.appendChild(option);
                 });
-            } catch (error) {
-                console.error('Müstahsil listesi yüklenemedi:', error);
+            } catch (error) { console.error('Müstahsil listesi yüklenemedi:', error); }
+        }
+
+        function renderMalListesi() {
+            dom.malListesiContainer.innerHTML = '';
+            if (malListesi.length === 0) {
+                dom.emptyListMessage.classList.remove('hidden');
+                dom.malListesiContainer.appendChild(dom.emptyListMessage);
+            } else {
+                dom.emptyListMessage.classList.add('hidden');
+                malListesi.forEach((mal, index) => {
+                    const listItem = document.createElement('div');
+                    listItem.className = 'flex justify-between items-center p-2 rounded-lg';
+                    listItem.style.backgroundColor = 'var(--bg-color)';
+                    const text = document.createElement('span');
+                    text.textContent = `${mal.cins} - ${mal.adet} adet`;
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Sil';
+                    deleteBtn.className = 'text-red-500 hover:text-red-700 text-sm font-semibold';
+                    deleteBtn.onclick = () => deleteMal(index);
+                    listItem.appendChild(text);
+                    listItem.appendChild(deleteBtn);
+                    dom.malListesiContainer.appendChild(listItem);
+                });
             }
         }
+
+        function deleteMal(index) { malListesi.splice(index, 1); renderMalListesi(); drawReceipt(); }
+        function clearMalInputs() { dom.malCinsi.value = ''; dom.doluKantar.value = ''; dom.bosKantar.value = ''; dom.adet.value = ''; dom.malCinsi.focus(); }
+        function resetForm() { malListesi = []; dom.mustahsilAdi.value = ''; clearMalInputs(); renderMalListesi(); drawReceipt(); dom.resultMessage.classList.add('hidden'); setCurrentDateTime(); }
         
-        // --- WebSocket Logic for Scale (Değişiklik yok) ---
-        function connectToScale() {
-            const ws = new WebSocket('ws://localhost:5678');
-            ws.onopen = () => { statusDot.className = 'status-dot bg-green-500'; statusText.textContent = 'Kantar Bağlandı'; getDoluBtn.disabled = false; getBosBtn.disabled = false; };
-            ws.onmessage = (event) => { const data = JSON.parse(event.data); if (data.type === 'weight_update') { lastWeightFromScale = data.weight; statusText.textContent = `Kantar: ${data.weight.toFixed(3)} kg`; } };
-            ws.onclose = () => { statusDot.className = 'status-dot bg-red-500'; statusText.textContent = 'Kantar Bağlantısı Kesildi'; getDoluBtn.disabled = true; getBosBtn.disabled = true; setTimeout(connectToScale, 3000); };
-            ws.onerror = (error) => { statusText.textContent = 'Bağlantı Hatası'; ws.close(); };
+        function showResultMessage(message, type) {
+            dom.resultMessage.textContent = message;
+            if (type === 'success') { dom.resultMessage.className = 'block text-center p-4 rounded-lg bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'; } 
+            else { dom.resultMessage.className = 'block text-center p-4 rounded-lg bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'; }
+            dom.resultMessage.classList.remove('hidden');
         }
-        getDoluBtn.addEventListener('click', () => { if (lastWeightFromScale !== null) doluKantarInput.value = lastWeightFromScale; });
-        getBosBtn.addEventListener('click', () => { if (lastWeightFromScale !== null) bosKantarInput.value = lastWeightFromScale; });
 
-        // --- Dark Mode Logic (Değişiklik yok) ---
-        function applyTheme(isDark) {
-            if (isDark) { document.documentElement.classList.add('dark'); lightIcon.classList.remove('hidden'); darkIcon.classList.add('hidden'); localStorage.setItem('theme', 'dark'); } 
-            else { document.documentElement.classList.remove('dark'); lightIcon.classList.add('hidden'); darkIcon.classList.remove('hidden'); localStorage.setItem('theme', 'light'); }
-            drawReceipt();
-        }
-        themeToggleBtn.addEventListener('click', () => { applyTheme(!document.documentElement.classList.contains('dark')); });
-
-        // --- Business Logic & Event Listeners (Değişiklik yok) ---
-        function getDara(kasaTuru, adet) { const carpanlar = { 'siyah': 0.7, 'sepet': 1.3, 'standart': 1.5, 'büyük': 2.0 }; return (carpanlar[kasaTuru] || 0) * adet; }
-        addMalBtn.addEventListener('click', () => {
-            const mal = { cins: malCinsiInput.value, kasaTuru: kasaTuruSelect.value, doluKantar: parseFloat(doluKantarInput.value) || 0, bosKantar: parseFloat(bosKantarInput.value) || 0, adet: parseInt(adetInput.value) || 0, };
+        // --- Event Listeners ---
+        dom.settingsBtn.addEventListener('click', openSettingsModal);
+        dom.saveSettingsBtn.addEventListener('click', saveSettings);
+        dom.cancelSettingsBtn.addEventListener('click', () => dom.settingsModal.classList.add('hidden'));
+        dom.themeToggle.addEventListener('click', () => applyTheme(!document.documentElement.classList.contains('dark')));
+        dom.getDoluBtn.addEventListener('click', () => { if (lastWeightFromScale !== null) dom.doluKantar.value = lastWeightFromScale; });
+        dom.getBosBtn.addEventListener('click', () => { if (lastWeightFromScale !== null) dom.bosKantar.value = lastWeightFromScale; });
+        dom.addMalBtn.addEventListener('click', () => {
+            const mal = { cins: dom.malCinsi.value, kasaTuru: dom.kasaTuru.value, doluKantar: parseFloat(dom.doluKantar.value) || 0, bosKantar: parseFloat(dom.bosKantar.value) || 0, adet: parseInt(dom.adet.value) || 0 };
             if (!mal.cins || mal.doluKantar <= 0 || mal.adet <= 0) { alert('Lütfen mal bilgilerini eksiksiz girin.'); return; }
             malListesi.push(mal); renderMalListesi(); drawReceipt(); clearMalInputs();
         });
-        printSaveBtn.addEventListener('click', async () => {
-            const mustahsilAdi = mustahsilAdiInput.value;
-            if (!mustahsilAdi || malListesi.length === 0) { alert('Müstahsil adı ve en az bir mal girişi zorunludur.'); return; }
-            showLoadingMessage('Fiş işleniyor, lütfen bekleyin...');
+        dom.printSaveBtn.addEventListener('click', async () => {
+            const settings = getSettings();
+            if (!dom.mustahsilAdi.value || malListesi.length === 0) { alert('Müstahsil adı ve en az bir mal girişi zorunludur.'); return; }
+            showResultMessage('Fiş işleniyor...', 'info');
             try {
-                const response = await fetch('/print_and_save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mustahsilAdi, malListesi }), });
+                const response = await fetch('/print_and_save', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mustahsilAdi: dom.mustahsilAdi.value,
+                        malListesi: malListesi,
+                        fisTarihi: dom.fisTarihi.value.replace('T', ' '),
+                        printerConfig: settings.printer
+                    }),
+                });
                 const result = await response.json();
                 if (response.ok) {
                     showResultMessage(result.message, 'success');
-                    setTimeout(() => { resetForm(); loadMustahsiller(); }, 2000); // YENİ: Başarılı işlem sonrası listeyi güncelle
+                    setTimeout(() => { resetForm(); loadMustahsiller(); }, 2000);
                 } else { showResultMessage(`Hata: ${result.message}`, 'error'); }
             } catch (error) { showResultMessage(`Ağ hatası: ${error.message}`, 'error'); }
         });
-        cancelBtn.addEventListener('click', () => { if (confirm('Mevcut fiş iptal edilecek ve tüm veriler silinecek. Emin misiniz?')) { resetForm(); } });
-        newTabBtn.addEventListener('click', () => { window.open(window.location.href, '_blank'); });
+        dom.cancelBtn.addEventListener('click', () => { if (confirm('Mevcut fiş iptal edilecek. Emin misiniz?')) resetForm(); });
+        dom.newTabBtn.addEventListener('click', () => window.open(window.location.href, '_blank'));
+        dom.mustahsilAdi.addEventListener('input', drawReceipt);
+        dom.fisTarihi.addEventListener('change', drawReceipt);
 
-        // --- UI Update Functions (Değişiklik yok) ---
-        function renderMalListesi() {
-            malListesiContainer.innerHTML = '';
-            if (malListesi.length === 0) { malListesiContainer.appendChild(emptyListMessage); emptyListMessage.classList.remove('hidden'); } 
-            else {
-                emptyListMessage.classList.add('hidden');
-                malListesi.forEach((mal, index) => {
-                    const listItem = document.createElement('div'); listItem.className = 'flex justify-between items-center p-2 rounded-lg'; listItem.style.backgroundColor = 'var(--bg-color)';
-                    const text = document.createElement('span'); text.textContent = `${mal.cins} - ${mal.adet} adet`;
-                    const deleteBtn = document.createElement('button'); deleteBtn.textContent = 'Sil'; deleteBtn.className = 'text-red-500 hover:text-red-700 text-sm font-semibold'; deleteBtn.onclick = () => deleteMal(index);
-                    listItem.appendChild(text); listItem.appendChild(deleteBtn); malListesiContainer.appendChild(listItem);
-                });
-            }
+        // --- Canvas Drawing & Resizing ---
+        function resizeCanvas() {
+            const container = dom.canvasContainer;
+            const ratio = 1.5; // Yükseklik/Genişlik oranı
+            dom.canvas.width = container.clientWidth;
+            dom.canvas.height = container.clientWidth * ratio;
+            drawReceipt();
         }
-        function deleteMal(index) { malListesi.splice(index, 1); renderMalListesi(); drawReceipt(); }
-        function clearMalInputs() { malCinsiInput.value = ''; doluKantarInput.value = ''; bosKantarInput.value = ''; adetInput.value = ''; malCinsiInput.focus(); }
-        function resetForm() { malListesi = []; mustahsilAdiInput.value = ''; clearMalInputs(); renderMalListesi(); drawReceipt(); resultMessage.classList.add('hidden'); }
-        function showLoadingMessage(message) { resultMessage.textContent = message; resultMessage.className = 'block text-center p-4 rounded-lg bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'; resultMessage.classList.remove('hidden'); }
-        function showResultMessage(message, type) {
-            if (type === 'success') { resultMessage.className = 'block text-center p-4 rounded-lg bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'; } 
-            else { resultMessage.className = 'block text-center p-4 rounded-lg bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'; }
-            resultMessage.textContent = message; resultMessage.classList.remove('hidden');
-        }
-        
-        // --- Canvas Drawing (Değişiklik yok) ---
+
         function drawReceipt() {
-            const isDark = document.documentElement.classList.contains('dark'); const W = canvas.width; ctx.clearRect(0, 0, W, canvas.height); ctx.fillStyle = isDark ? '#e2e8f0' : '#334155'; const FONT_SIZE = 16; ctx.font = `${FONT_SIZE}px monospace`; let y = 40;
-            ctx.font = `bold ${FONT_SIZE * 1.5}px monospace`; ctx.textAlign = 'center'; ctx.fillText('MAL BILGI FISI', W / 2, y); y += 50;
-            ctx.textAlign = 'left'; ctx.font = `${FONT_SIZE}px monospace`; ctx.fillText('Müstahsil Adı:', 15, y); y += FONT_SIZE * 1.2; ctx.fillText(mustahsilAdiInput.value || " ", 15, y); y += 40;
+            const isDark = document.documentElement.classList.contains('dark');
+            const W = dom.canvas.width;
+            const H = dom.canvas.height;
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = isDark ? '#e2e8f0' : '#334155';
+            const FONT_SIZE = W / 28; // Yazı boyutunu canvas genişliğine göre ayarla
+            ctx.font = `${FONT_SIZE}px monospace`;
+            let y = FONT_SIZE * 2.5;
+            
+            ctx.font = `bold ${FONT_SIZE * 1.5}px monospace`;
+            ctx.textAlign = 'center';
+            ctx.fillText('MAL BILGI FISI', W / 2, y);
+            y += FONT_SIZE * 3;
+            
+            ctx.textAlign = 'left';
+            ctx.font = `${FONT_SIZE}px monospace`;
+            ctx.fillText('Müstahsil Adı:', 15, y);
+            y += FONT_SIZE * 1.2;
+            ctx.fillText(dom.mustahsilAdi.value || " ", 15, y);
+            y += FONT_SIZE * 2.5;
+            
             let toplamSafi = 0;
-            const drawBoldKeyValue = (key, value, yPos) => { ctx.font = `bold ${FONT_SIZE}px monospace`; ctx.fillText(key, 15, yPos); ctx.font = `${FONT_SIZE}px monospace`; ctx.fillText(value, 160, yPos); };
+            const drawBoldKeyValue = (key, value, yPos) => {
+                ctx.font = `bold ${FONT_SIZE}px monospace`;
+                ctx.fillText(key, 15, yPos);
+                ctx.font = `${FONT_SIZE}px monospace`;
+                ctx.fillText(value, W * 0.4, yPos);
+            };
+            
             malListesi.forEach(mal => {
-                const kantarFark = mal.doluKantar - mal.bosKantar; const dara = getDara(mal.kasaTuru, mal.adet); const netKilo = kantarFark - dara; toplamSafi += netKilo;
+                const kantarFark = mal.doluKantar - mal.bosKantar;
+                const dara = getDara(mal.kasaTuru, mal.adet);
+                const netKilo = kantarFark - dara;
+                toplamSafi += netKilo;
                 ctx.fillText('------------------------------------', 15, y); y += FONT_SIZE * 1.5;
                 drawBoldKeyValue('D. Kantar   :', `${mal.doluKantar.toFixed(2)} kg`, y); y += FONT_SIZE * 1.5;
                 drawBoldKeyValue('B. Kantar   :', `${mal.bosKantar.toFixed(2)} kg`, y); y += FONT_SIZE * 1.5;
@@ -270,24 +364,36 @@
                 drawBoldKeyValue('Dara        :', `${dara.toFixed(2)} kg`, y); y += FONT_SIZE * 1.5;
                 drawBoldKeyValue('Safi        :', `${netKilo.toFixed(2)} kg`, y); y += FONT_SIZE * 1.5;
             });
+            
             if (malListesi.length > 0) {
-                y += FONT_SIZE; ctx.fillText('------------------------------------', 15, y); y += FONT_SIZE * 1.5; ctx.font = `bold ${FONT_SIZE}px monospace`; ctx.fillText(`NET SAFI: ${toplamSafi.toFixed(2)} kg`, 15, y); y += FONT_SIZE * 1.5; ctx.fillText('------------------------------------', 15, y); y += FONT_SIZE * 2;
+                y += FONT_SIZE;
+                ctx.fillText('------------------------------------', 15, y); y += FONT_SIZE * 1.5;
+                ctx.font = `bold ${FONT_SIZE}px monospace`;
+                ctx.fillText(`NET SAFI: ${toplamSafi.toFixed(2)} kg`, 15, y); y += FONT_SIZE * 1.5;
+                ctx.fillText('------------------------------------', 15, y); y += FONT_SIZE * 2;
             }
-            ctx.textAlign = 'center'; ctx.font = `${FONT_SIZE}px monospace`; const now = new Date(); ctx.fillText('Tarih:', W/2, y); y += FONT_SIZE * 1.2; ctx.fillText(now.toLocaleString('tr-TR'), W / 2, y); y += FONT_SIZE * 2.5; ctx.fillText('Bereketli olsun...', W / 2, y); y += FONT_SIZE * 2.5;
-            ctx.font = `italic ${FONT_SIZE * 0.8}px monospace`; ctx.fillText('Bilgilendirme amaçlıdır.', W / 2, y);
+            
+            ctx.textAlign = 'center';
+            ctx.font = `${FONT_SIZE}px monospace`;
+            const tarih = dom.fisTarihi.value ? new Date(dom.fisTarihi.value).toLocaleString('tr-TR') : new Date().toLocaleString('tr-TR');
+            ctx.fillText('Tarih:', W/2, y); y += FONT_SIZE * 1.2;
+            ctx.fillText(tarih, W / 2, y); y += FONT_SIZE * 2.5;
+            ctx.fillText('Bereketli olsun...', W / 2, y); y += FONT_SIZE * 2.5;
+            ctx.font = `italic ${FONT_SIZE * 0.8}px monospace`;
+            ctx.fillText('Bilgilendirme amaçlıdır.', W / 2, y);
         }
 
-        // --- Initial Load ---
+        // --- Initial Load & Resize Listener ---
         window.onload = () => {
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             const savedTheme = localStorage.getItem('theme');
-            applyTheme(savedTheme === 'dark' || (savedTheme === null && prefersDark));
-            renderMalListesi();
-            drawReceipt();
+            applyTheme(savedTheme === 'dark' || (savedTheme === null && window.matchMedia('(prefers-color-scheme: dark)').matches));
+            setCurrentDateTime();
             connectToScale();
-            loadMustahsiller(); // YENİ: Sayfa yüklendiğinde müstahsilleri yükle
+            loadMustahsiller();
+            renderMalListesi();
+            resizeCanvas();
         };
-        mustahsilAdiInput.addEventListener('keyup', drawReceipt);
+        window.addEventListener('resize', resizeCanvas);
     </script>
 </body>
 </html>
